@@ -46,12 +46,10 @@ func (u UserModel) Insert(user *User) error {
 	`
 
 	args := []any{user.Username, user.Email, user.Password.hash, user.Activated}
-
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	err := u.DB.QueryRowContext(ctx, query, args...).Scan(&user.ID, &user.CreatedAt, &user.Version)
-
 	if err != nil {
 		switch {
 		case err.Error() == `pq: duplicate key value violates unique constraint "users_email_key"`:
@@ -60,7 +58,6 @@ func (u UserModel) Insert(user *User) error {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -73,7 +70,6 @@ func (u UserModel) Get(id int64) (*User, error) {
 	`
 
 	var user User
-
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -86,7 +82,6 @@ func (u UserModel) Get(id int64) (*User, error) {
 			return nil, err
 		}
 	}
-
 	return &user, nil
 }
 
@@ -126,7 +121,6 @@ func (p *password) Set(plaintext string) error {
 
 	p.plaintext = &plaintext
 	p.hash = hash
-
 	return nil
 }
 
@@ -162,13 +156,11 @@ func ValidatePasswordPlaintext(v *validator.Validator, password string) {
 func ValidateUser(v *validator.Validator, user *User) {
 	v.Check(user.Username != "", "username", "must be provided")
 	v.Check(len(user.Username) <= 200, "username", "must be less than 200 bytes")
-
 	ValidateEmail(v, user.Email)
 
 	if user.Password.plaintext != nil {
 		ValidatePasswordPlaintext(v, *user.Password.plaintext)
 	}
-
 	if user.Password.hash == nil {
 		panic("missing password hash")
 	}
@@ -202,6 +194,5 @@ func (u UserModel) GetForToken(scope string, plaintext string) (*User, error) {
 			return nil, err
 		}
 	}
-
 	return &user, nil
 }

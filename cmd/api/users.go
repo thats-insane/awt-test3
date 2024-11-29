@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -9,7 +10,8 @@ import (
 	"github.com/thats-insane/awt-test3/internal/validator"
 )
 
-func (a *appDependencies) registerUserHandler(w http.ResponseWriter, r *http.Request) {
+/* Register a new user, create their token and send them an activation email */
+func (a *appDependencies) createUserHandler(w http.ResponseWriter, r *http.Request) {
 	var incomingData struct {
 		Username string `json:"username"`
 		Email    string `json:"email"`
@@ -27,18 +29,14 @@ func (a *appDependencies) registerUserHandler(w http.ResponseWriter, r *http.Req
 		Email:     incomingData.Email,
 		Activated: false,
 	}
-
 	err = user.Password.Set(incomingData.Password)
-
 	if err != nil {
 		a.serverErr(w, r, err)
 		return
 	}
 
 	v := validator.New()
-
 	data.ValidateUser(v, user)
-
 	if !v.IsEmpty() {
 		a.failedValidation(w, r, v.Errors)
 		return
@@ -84,6 +82,7 @@ func (a *appDependencies) registerUserHandler(w http.ResponseWriter, r *http.Req
 	}
 }
 
+/* Activate user using their auth token */
 func (a *appDependencies) activateUserHandler(w http.ResponseWriter, r *http.Request) {
 	var incomingData struct {
 		Plaintext string `json:"token"`
@@ -136,6 +135,37 @@ func (a *appDependencies) activateUserHandler(w http.ResponseWriter, r *http.Req
 	}
 }
 
+/* Grab user from database and display */
+func (a *appDependencies) displayUserHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := a.readIDParam(r)
+	if err != nil {
+		a.notFound(w, r)
+		return
+	}
+
+	user, err := a.userModel.Get(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			a.notFound(w, r)
+		default:
+			a.serverErr(w, r, err)
+		}
+		return
+	}
+
+	data := envelope{
+		"user": user,
+	}
+
+	err = a.writeJSON(w, http.StatusOK, data, nil)
+	if err != nil {
+		a.serverErr(w, r, err)
+		return
+	}
+}
+
+/* Display users and lists they have made */
 func (a *appDependencies) displayUserListsHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {
@@ -167,6 +197,41 @@ func (a *appDependencies) displayUserListsHandler(w http.ResponseWriter, r *http
 
 	data := envelope{
 		"lists": books,
+	}
+
+	err = a.writeJSON(w, http.StatusOK, data, nil)
+	if err != nil {
+		a.serverErr(w, r, err)
+		return
+	}
+}
+
+/* Display users and reviews they have made */
+func (a *appDependencies) displayUserReviewsHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := a.readIDParam(r)
+	if err != nil {
+		a.notFound(w, r)
+		return
+	}
+
+	userreviews, err := a.reviewModel.GetUser(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			a.notFound(w, r)
+		default:
+			a.serverErr(w, r, err)
+		}
+		return
+	}
+
+	// iterate over all the user reviews and match them to the book
+	var data map[string]any
+	for i, review := range userreviews {
+		reviews := envelope{
+			"bookID": review.BookID,
+		}
+		data[fmt.Sprintf("review%d", i)] = reviews
 	}
 
 	err = a.writeJSON(w, http.StatusOK, data, nil)

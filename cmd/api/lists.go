@@ -9,6 +9,7 @@ import (
 	"github.com/thats-insane/awt-test3/internal/validator"
 )
 
+/* Create a new list */
 func (a *appDependencies) createListHandler(w http.ResponseWriter, r *http.Request) {
 	var incomingData struct {
 		Name       string `json:"name"`
@@ -59,6 +60,7 @@ func (a *appDependencies) createListHandler(w http.ResponseWriter, r *http.Reque
 	fmt.Fprintf(w, "%+v\n", incomingData)
 }
 
+/* Select all lists */
 func (a *appDependencies) listListsHandler(w http.ResponseWriter, r *http.Request) {
 	var queryParametersData struct {
 		data.Filters
@@ -92,6 +94,7 @@ func (a *appDependencies) listListsHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+/* Add a new book to reading list */
 func (a *appDependencies) addBookToListHandler(w http.ResponseWriter, r *http.Request) {
 	var incomingData struct {
 		ListID int64 `json:"list_id"`
@@ -129,6 +132,7 @@ func (a *appDependencies) addBookToListHandler(w http.ResponseWriter, r *http.Re
 	fmt.Fprintf(w, "%+v\n", incomingData)
 }
 
+/* Select one reading list */
 func (a *appDependencies) displayListHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {
@@ -158,6 +162,7 @@ func (a *appDependencies) displayListHandler(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+/* Update a reading list */
 func (a *appDependencies) updateListHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {
@@ -230,6 +235,7 @@ func (a *appDependencies) updateListHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
+/* Delete a reading list */
 func (a *appDependencies) deleteListHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {
@@ -258,6 +264,7 @@ func (a *appDependencies) deleteListHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
+/* Delete a book from a reading list */
 func (a *appDependencies) deleteBookFromListHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {

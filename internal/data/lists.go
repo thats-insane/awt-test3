@@ -29,6 +29,7 @@ type ListModel struct {
 	DB *sql.DB
 }
 
+/* Add a new reading list to the database */
 func (l ListModel) Insert(list *List) error {
 	query := `
 		INSERT INTO lists(name, desc, user_id, book_list_id, status)
@@ -44,6 +45,7 @@ func (l ListModel) Insert(list *List) error {
 
 }
 
+/* Select all reading lists from database */
 func (l ListModel) GetAll(filters Filters) ([]*List, Metadata, error) {
 	query := fmt.Sprintf(`
 		SELECT id, name, description, user_id, book_list_id, status
@@ -84,6 +86,7 @@ func (l ListModel) GetAll(filters Filters) ([]*List, Metadata, error) {
 	return lists, metadata, nil
 }
 
+/* Insert book into list */
 func (l ListModel) AddBook(booklist *BookList) error {
 	query := `
 		INSERT INTO book_list (list_id, book_id)
@@ -99,6 +102,7 @@ func (l ListModel) AddBook(booklist *BookList) error {
 
 }
 
+/* Select specific reading list from database */
 func (l ListModel) Get(id int64) (*List, error) {
 	if id < 1 {
 		return nil, ErrRecordNotFound
@@ -126,6 +130,7 @@ func (l ListModel) Get(id int64) (*List, error) {
 	return &list, nil
 }
 
+/* Select all books in the reading list from the database */
 func (l ListModel) GetBooks(id int64) (*BookList, error) {
 	if id < 1 {
 		return nil, ErrRecordNotFound
@@ -153,6 +158,7 @@ func (l ListModel) GetBooks(id int64) (*BookList, error) {
 	return &booklist, nil
 }
 
+/* Update a reading list's entry */
 func (l ListModel) Update(list *List) error {
 	query := `
 		UPDATE list
@@ -168,6 +174,7 @@ func (l ListModel) Update(list *List) error {
 	return l.DB.QueryRowContext(ctx, query, args...).Scan(&list.ID)
 }
 
+/* Delete a reading list (delete books from the reading list seperately) */
 func (l ListModel) Delete(id int64) error {
 	if id < 1 {
 		return nil
@@ -198,6 +205,7 @@ func (l ListModel) Delete(id int64) error {
 	return nil
 }
 
+/* Delete books from reading list */
 func (l ListModel) DeleteBook(id int64) error {
 	if id < 1 {
 		return nil
@@ -228,6 +236,7 @@ func (l ListModel) DeleteBook(id int64) error {
 	return nil
 }
 
+/* Validation for reading list */
 func ValidateList(v *validator.Validator, list *List) {
 	v.Check(list.Name != "", "list", "must be provided")
 	v.Check(len(list.Name) <= 100, "list", "must not be more than 100 bytes long")

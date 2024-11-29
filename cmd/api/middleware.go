@@ -78,6 +78,7 @@ func (a *appDependencies) rateLimit(next http.Handler) http.Handler {
 	})
 }
 
+/* Authenticate a user using the token */
 func (a *appDependencies) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Vary", "Authorization")
@@ -102,7 +103,7 @@ func (a *appDependencies) authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		user, err := a.userModel.GetForToken(data.ScopeActivation, token)
+		user, err := a.userModel.GetForToken(data.ScopeAuthentication, token)
 		if err != nil {
 			switch {
 			case errors.Is(err, data.ErrRecordNotFound):
@@ -118,6 +119,7 @@ func (a *appDependencies) authenticate(next http.Handler) http.Handler {
 	})
 }
 
+/* Check if user is authenticated (not anonymous) */
 func (a *appDependencies) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := a.ctxGetUser(r)
@@ -131,7 +133,8 @@ func (a *appDependencies) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-func (a *appDependencies) requireActivatedUser(next http.HandlerFunc) http.HandlerFunc {
+/* Check if user is activated */
+func (a *appDependencies) requireActivated(next http.HandlerFunc) http.HandlerFunc {
 	fn := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := a.ctxGetUser(r)
 

@@ -10,6 +10,7 @@ import (
 	"github.com/thats-insane/awt-test3/internal/validator"
 )
 
+/* Create a new book */
 func (a *appDependencies) createBookHandler(w http.ResponseWriter, r *http.Request) {
 	var incomingData struct {
 		Title     string    `json:"title"`
@@ -63,6 +64,7 @@ func (a *appDependencies) createBookHandler(w http.ResponseWriter, r *http.Reque
 	fmt.Fprintf(w, "%+v\n", incomingData)
 }
 
+/* Display a book */
 func (a *appDependencies) displayBookHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {
@@ -92,6 +94,7 @@ func (a *appDependencies) displayBookHandler(w http.ResponseWriter, r *http.Requ
 	}
 }
 
+/* Update a book */
 func (a *appDependencies) updateBookHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {
@@ -168,6 +171,7 @@ func (a *appDependencies) updateBookHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
+/* Delete a book */
 func (a *appDependencies) deleteBookHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {
@@ -196,6 +200,7 @@ func (a *appDependencies) deleteBookHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
+/* List all books */
 func (a *appDependencies) listBooksHandler(w http.ResponseWriter, r *http.Request) {
 	var queryParametersData struct {
 		data.Filters
@@ -229,6 +234,7 @@ func (a *appDependencies) listBooksHandler(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+/* Search for a book based on filters */
 func (a *appDependencies) searchBooksHandler(w http.ResponseWriter, r *http.Request) {
 	var queryParametersData struct {
 		Title  string

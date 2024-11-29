@@ -23,11 +23,12 @@ type ReviewModel struct {
 	DB *sql.DB
 }
 
+/* Add a new review */
 func (r ReviewModel) Insert(review *Review) error {
 	query := `
-	INSERT INTO reviews (book_id, user_id, rating, desc)
-	VALUES ($1, $2, $3, $4)
-	RETURNING id, created_at
+		INSERT INTO reviews (book_id, user_id, rating, desc)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id, created_at
 	`
 	args := []any{review.BookID, review.UserID, review.Rating, review.Desc}
 
@@ -37,14 +38,15 @@ func (r ReviewModel) Insert(review *Review) error {
 	return r.DB.QueryRowContext(ctx, query, args...).Scan(&review.ID)
 }
 
+/* Select a review */
 func (r ReviewModel) Get(id int64) (*Review, error) {
 	if id < 1 {
 		return nil, ErrRecordNotFound
 	}
 	query := `
-	SELECT id, book_id, user_id, rating, desc
-	FROM reviews
-	WHERE id = $1
+		SELECT id, book_id, user_id, rating, desc
+		FROM reviews
+		WHERE id = $1
 	`
 	var review Review
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -60,12 +62,51 @@ func (r ReviewModel) Get(id int64) (*Review, error) {
 	return &review, nil
 }
 
+/* Select all reviews from one user */
+func (r ReviewModel) GetUser(id int64) ([]*Review, error) {
+	if id < 1 {
+		return nil, ErrRecordNotFound
+	}
+	query := `
+		SELECT id, book_id, user_id, rating, desc
+		FROM reviews
+		WHERE user_id = $1
+	`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	rows, err := r.DB.QueryContext(ctx, query, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	reviews := []*Review{}
+	for rows.Next() {
+		var review Review
+		err := rows.Scan(&review.ID, &review.BookID, &review.UserID, &review.Rating, &review.Desc, &review.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		reviews = append(reviews, &review)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return reviews, nil
+}
+
+/* Select all reviews */
 func (r ReviewModel) GetAll(filters Filters) ([]*Review, Metadata, error) {
 	query := fmt.Sprintf(`
-	SELECT id, book_id, user_id, rating, desc
-	FROM reviews
-	ORDER BY %s %s, id ASC
-	LIMIT $1 OFFSET $2
+		SELECT id, book_id, user_id, rating, desc
+		FROM reviews
+		ORDER BY %s %s, id ASC
+		LIMIT $1 OFFSET $2
 	`, filters.sortColumn(), filters.sortDirection())
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -99,6 +140,7 @@ func (r ReviewModel) GetAll(filters Filters) ([]*Review, Metadata, error) {
 	return reviews, metadata, nil
 }
 
+/* Update a review */
 func (r ReviewModel) Update(review *Review) error {
 	query := `
 		UPDATE reviews
@@ -114,6 +156,7 @@ func (r ReviewModel) Update(review *Review) error {
 	return r.DB.QueryRowContext(ctx, query, args...).Scan(&review.ID)
 }
 
+/* Delete a review */
 func (r ReviewModel) Delete(id int64) error {
 	if id < 1 {
 		return ErrRecordNotFound
@@ -143,6 +186,7 @@ func (r ReviewModel) Delete(id int64) error {
 	return nil
 }
 
+/* Validation for review */
 func ValidateReview(v *validator.Validator, review *Review) {
 	v.Check(review.BookID > 0, "review", "must be a positive integer")
 	v.Check(review.UserID > 0, "review", "must be a positive integer")

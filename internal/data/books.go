@@ -25,6 +25,7 @@ type BookModel struct {
 	DB *sql.DB
 }
 
+/* Add a new book */
 func (b BookModel) Insert(book *Book) error {
 	query := `
 		INSERT INTO books (title, author, isbn, publication_date, genre, description, average_rating) 
@@ -40,6 +41,7 @@ func (b BookModel) Insert(book *Book) error {
 	return b.DB.QueryRowContext(ctx, query, args...).Scan(&book.ID)
 }
 
+/* Select a book */
 func (b BookModel) Get(id int64) (*Book, error) {
 	if id < 1 {
 		return nil, ErrRecordNotFound
@@ -67,6 +69,7 @@ func (b BookModel) Get(id int64) (*Book, error) {
 	return &book, nil
 }
 
+/* Select all books */
 func (b BookModel) GetAll(filters Filters) ([]*Book, Metadata, error) {
 	query := fmt.Sprintf(`
 		SELECT id, title, author, isbn, publication_date, genre, description, average_rating
@@ -106,6 +109,7 @@ func (b BookModel) GetAll(filters Filters) ([]*Book, Metadata, error) {
 	return books, metadata, nil
 }
 
+/* Update a book */
 func (b BookModel) Update(book *Book, id int64) error {
 	query := `
 		UPDATE books
@@ -121,6 +125,7 @@ func (b BookModel) Update(book *Book, id int64) error {
 	return b.DB.QueryRowContext(ctx, query, args...).Scan(&book.ID)
 }
 
+/* Delete a book */
 func (b BookModel) Delete(id int64) error {
 	if id < 1 {
 		return ErrRecordNotFound
@@ -150,6 +155,7 @@ func (b BookModel) Delete(id int64) error {
 	return nil
 }
 
+/* Select a book using filters */
 func (b BookModel) Search(title string, author string, genre string, filters Filters) ([]*Book, Metadata, error) {
 	query := `
         SELECT id, title, author, isbn, publication_date, genre, description, average_rating
@@ -195,6 +201,7 @@ func (b BookModel) Search(title string, author string, genre string, filters Fil
 	return books, metadata, nil
 }
 
+/* Validation for book */
 func ValidateBook(v *validator.Validator, book *Book) {
 	v.Check(book.Title != "", "book", "must be provided")
 	v.Check(len(book.Title) <= 100, "book", "must not be more than 100 bytes long")

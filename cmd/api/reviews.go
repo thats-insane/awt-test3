@@ -10,6 +10,7 @@ import (
 	"github.com/thats-insane/awt-test3/internal/validator"
 )
 
+/* Add a new review */
 func (a *appDependencies) createReviewHandler(w http.ResponseWriter, r *http.Request) {
 	var incomingData struct {
 		BookID    int64     `json:"book_id"`
@@ -59,6 +60,7 @@ func (a *appDependencies) createReviewHandler(w http.ResponseWriter, r *http.Req
 	fmt.Fprintf(w, "%+v\n", incomingData)
 }
 
+/* Display a review */
 func (a *appDependencies) displayReviewHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {
@@ -88,6 +90,7 @@ func (a *appDependencies) displayReviewHandler(w http.ResponseWriter, r *http.Re
 	}
 }
 
+/* Update a review */
 func (a *appDependencies) updateReviewHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {
@@ -159,6 +162,7 @@ func (a *appDependencies) updateReviewHandler(w http.ResponseWriter, r *http.Req
 	}
 }
 
+/* Delete a review */
 func (a *appDependencies) deleteReviewHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := a.readIDParam(r)
 	if err != nil {
@@ -186,59 +190,3 @@ func (a *appDependencies) deleteReviewHandler(w http.ResponseWriter, r *http.Req
 		a.serverErr(w, r, err)
 	}
 }
-
-/*
-func (a *appDependencies) listReviewsHandler(w http.ResponseWriter, r *http.Request) {
-	var queryParametersData struct {
-		// Product string
-		data.Filters
-	}
-
-	queryParameters := r.URL.Query()
-	// queryParametersData.Product = a.getSingleQueryParameters(queryParameters, "product", "")
-
-	queryParametersData.Filters.Sort = a.getSingleQueryParameters(queryParameters, "sort", "id")
-	// queryParametersData.Filters.Sort = a.getSingleQueryParameters(queryParameters, "sort", "rating")
-	// queryParametersData.Filters.Sort = a.getSingleQueryParameters(queryParameters, "sort", "helpful_count")
-	// queryParametersData.Filters.Sort = a.getSingleQueryParameters(queryParameters, "sort", "created_at")
-	// queryParametersData.Filters.Sort = a.getSingleQueryParameters(queryParameters, "sort", "updated_at")
-
-	// queryParametersData.Filters.SortSafeList = []string{"id", "rating", "helpful_count", "created_at", "updated_at", "-id", "-rating", "-helpful_count", "-created_at", "-updated_at"}
-	queryParametersData.Filters.SortSafeList = []string{"id", "-id"}
-
-	v := validator.New()
-
-	queryParametersData.Filters.Page = a.getSingleIntegerParameters(queryParameters, "page", 1, v)
-	queryParametersData.Filters.PageSize = a.getSingleIntegerParameters(queryParameters, "page_size", 10, v)
-
-	data.ValidateFilters(v, queryParametersData.Filters)
-	if !v.IsEmpty() {
-		a.failedValidation(w, r, v.Errors)
-		return
-	}
-
-	// product_id, err := toInt(queryParametersData.Product)
-
-	// if err != nil {
-	// 	a.serverErr(w, r, err)
-	// 	return
-	// }
-
-	review, err := a.bookclub.GetAllReviews(queryParametersData.Filters)
-
-	if err != nil {
-		a.serverErr(w, r, err)
-		return
-	}
-
-	data := envelope{
-		"review": review,
-	}
-
-	err = a.writeJSON(w, http.StatusOK, data, nil)
-
-	if err != nil {
-		a.serverErr(w, r, err)
-	}
-}
-*/
