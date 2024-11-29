@@ -1,0 +1,40 @@
+{{define "subject"}}Welcome to your Book Club Management API!{{end}}
+
+{{define "plainBody"}}
+Hi,
+
+Thanks for signing up for a BCMA account. We're excited to have you on board!
+
+Please send a request to the `PUT /v1/users/activated` endpoint with the following JSON body to activate your account:
+{"token": "{{.activationToken}}"}
+
+Please note that this is a one-time use token and it will expire in 3 days.
+
+For future reference, your user ID number is {{.userID}}.
+
+Short disclaimer: deleting a reading list does not delete any books from that list.
+If you wish to delete a list and its content, please delete its books as well.
+
+Thanks,
+Cahlil
+{{end}}
+
+{{define "htmlBody"}}
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+    <p>Howdy,</p>
+    <p>Thanks for signing up for a Book Club Management API account. We're excited to have you on board!</p>
+    <p>For future reference, your user ID number is {{.userID}}.</p>
+    <p>Please send a request to the <code>PUT /v1/users/activated</code> endpoint with the following JSON body to activate your account:</p>
+    <pre><code>{"token": "{{.activationToken}}"}</code></pre>
+    <p>Please note that this is a one-time use token and it will expire in 3 days.</p> 
+    <p>Thanks,</p>
+    <p>Cahlil</p>
+</body>
+</html>
+{{end}}
