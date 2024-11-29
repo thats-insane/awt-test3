@@ -126,6 +126,33 @@ func (l ListModel) Get(id int64) (*List, error) {
 	return &list, nil
 }
 
+func (l ListModel) GetBooks(id int64) (*BookList, error) {
+	if id < 1 {
+		return nil, ErrRecordNotFound
+	}
+
+	query := `
+		SELECT id, list_id, book_id
+		FROM book_list
+		WHERE list_id = $1
+	`
+
+	var booklist BookList
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	err := l.DB.QueryRowContext(ctx, query, id).Scan(&booklist.ID, booklist.ListID, booklist.BookID)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+	return &booklist, nil
+}
+
 func (l ListModel) Update(list *List) error {
 	query := `
 		UPDATE list

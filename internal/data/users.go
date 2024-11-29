@@ -64,12 +64,12 @@ func (u UserModel) Insert(user *User) error {
 	return nil
 }
 
-/* Select a user based on their email */
-func (u UserModel) GetByEmail(email string) (*User, error) {
+/* Select a user based on their ID */
+func (u UserModel) Get(id int64) (*User, error) {
 	query := `
 		SELECT id, created_at, username, email, password_hash, activated, version
 		FROM users
-		WHERE email = $1
+		WHERE id = $1
 	`
 
 	var user User
@@ -77,8 +77,7 @@ func (u UserModel) GetByEmail(email string) (*User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	err := u.DB.QueryRowContext(ctx, query, email).Scan(&user.ID, &user.CreatedAt, &user.Username, &user.Email, &user.Password.hash, &user.Activated, &user.Version)
-
+	err := u.DB.QueryRowContext(ctx, query, id).Scan(&user.ID, &user.CreatedAt, &user.Username, &user.Email, &user.Password.hash, &user.Activated, &user.Version)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -101,12 +100,10 @@ func (u UserModel) Update(user *User) error {
 	`
 
 	args := []any{user.Username, user.Email, user.Password.hash, user.Activated, user.ID, user.Version}
-
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	err := u.DB.QueryRowContext(ctx, query, args...).Scan(&user.Version)
-
 	if err != nil {
 		switch {
 		case err.Error() == `pq: duplicate key value violates unique constraint "users_email_key"`:
@@ -117,14 +114,12 @@ func (u UserModel) Update(user *User) error {
 			return err
 		}
 	}
-
 	return nil
 }
 
 /* Hashes the password */
 func (p *password) Set(plaintext string) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(plaintext), 12)
-
 	if err != nil {
 		return err
 	}
@@ -138,7 +133,6 @@ func (p *password) Set(plaintext string) error {
 /* Authenticates password */
 func (p *password) Matches(plaintext string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword(p.hash, []byte(plaintext))
-
 	if err != nil {
 		switch {
 		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
@@ -200,7 +194,6 @@ func (u UserModel) GetForToken(scope string, plaintext string) (*User, error) {
 	defer cancel()
 
 	err := u.DB.QueryRowContext(ctx, query, args...).Scan(&user.ID, &user.CreatedAt, &user.Username, &user.Email, &user.Password.hash, &user.Activated, &user.Version)
-
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):

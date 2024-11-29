@@ -135,3 +135,43 @@ func (a *appDependencies) activateUserHandler(w http.ResponseWriter, r *http.Req
 		a.serverErr(w, r, err)
 	}
 }
+
+func (a *appDependencies) displayUserListsHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := a.readIDParam(r)
+	if err != nil {
+		a.notFound(w, r)
+		return
+	}
+
+	booklist, err := a.listModel.Get(id)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			a.notFound(w, r)
+		default:
+			a.serverErr(w, r, err)
+		}
+		return
+	}
+
+	books, err := a.listModel.GetBooks(booklist.BookListID)
+	if err != nil {
+		switch {
+		case errors.Is(err, data.ErrRecordNotFound):
+			a.notFound(w, r)
+		default:
+			a.serverErr(w, r, err)
+		}
+		return
+	}
+
+	data := envelope{
+		"lists": books,
+	}
+
+	err = a.writeJSON(w, http.StatusOK, data, nil)
+	if err != nil {
+		a.serverErr(w, r, err)
+		return
+	}
+}

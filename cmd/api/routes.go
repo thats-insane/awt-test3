@@ -19,9 +19,9 @@ func (a *appDependencies) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/api/v1/lists", a.requireActivatedUser(a.listListsHandler))
 	router.HandlerFunc(http.MethodGet, "/api/v1/lists/:id", a.requireActivatedUser(a.displayListHandler))
 	router.HandlerFunc(http.MethodGet, "/api/v1/books/:id/reviews", a.requireActivatedUser(a.displayReviewHandler))
-	router.HandlerFunc(http.MethodGet, "/api/v1/users/:id", a.requireActivatedUser(a.displayUserHandler))
+	// router.HandlerFunc(http.MethodGet, "/api/v1/users/:id", a.requireActivatedUser(a.displayUserHandler))
 	router.HandlerFunc(http.MethodGet, "/api/v1/users/:id/lists", a.requireActivatedUser(a.displayUserListsHandler))
-	router.HandlerFunc(http.MethodGet, "/api/v1/users/:id/reviews", a.requireActivatedUser(a.displayUserReviewsHandler))
+	// router.HandlerFunc(http.MethodGet, "/api/v1/users/:id/reviews", a.requireActivatedUser(a.displayUserReviewsHandler))
 
 	router.HandlerFunc(http.MethodPost, "/api/v1/users", a.registerUserHandler)
 	router.HandlerFunc(http.MethodPost, "/api/v1/books", a.requireActivatedUser(a.createBookHandler))
