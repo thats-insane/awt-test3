@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS book_list (
+    id bigserial PRIMARY KEY,
+    book_id INT NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+    list_id INT NOT NULL REFERENCES lists(id) ON DELETE CASCADE
+);

@@ -14,11 +14,11 @@ import (
 func (a *appDependencies) createBookHandler(w http.ResponseWriter, r *http.Request) {
 	var incomingData struct {
 		Title     string    `json:"title"`
-		ISBN      string    `json:"isbn"`
 		Author    string    `json:"author"`
+		ISBN      string    `json:"isbn"`
+		PubDate   time.Time `json:"pub_date"`
 		Genre     string    `json:"genre"`
 		Desc      string    `json:"desc"`
-		PubDate   time.Time `json:"pub_date"`
 		AvgRating float64   `json:"avg_rating"`
 	}
 	err := a.readJSON(w, r, &incomingData)
@@ -116,10 +116,10 @@ func (a *appDependencies) updateBookHandler(w http.ResponseWriter, r *http.Reque
 	var incomingData struct {
 		Title     *string    `json:"title"`
 		Author    *string    `json:"author"`
+		PubDate   *time.Time `json:"pub_date"`
 		ISBN      *string    `json:"isbn"`
 		Genre     *string    `json:"genre"`
 		Desc      *string    `json:"desc"`
-		PubDate   *time.Time `json:"pub_date"`
 		AvgRating *int       `json:"avg_rating"`
 	}
 	err = a.readJSON(w, r, &incomingData)
@@ -137,14 +137,14 @@ func (a *appDependencies) updateBookHandler(w http.ResponseWriter, r *http.Reque
 	if incomingData.ISBN != nil {
 		book.ISBN = *incomingData.ISBN
 	}
+	if incomingData.PubDate != nil {
+		book.PubDate = *incomingData.PubDate
+	}
 	if incomingData.Genre != nil {
 		book.Genre = *incomingData.Genre
 	}
 	if incomingData.Desc != nil {
 		book.Desc = *incomingData.Desc
-	}
-	if incomingData.PubDate != nil {
-		book.PubDate = *incomingData.PubDate
 	}
 
 	v := validator.New()

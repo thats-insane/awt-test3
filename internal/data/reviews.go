@@ -144,12 +144,12 @@ func (r ReviewModel) GetAll(filters Filters) ([]*Review, Metadata, error) {
 func (r ReviewModel) Update(review *Review) error {
 	query := `
 		UPDATE reviews
-		SET book_id = $1, user_id = $2, rating = $3
-		WHERE id = $4
+		SET book_id = $1, user_id = $2, rating = $3, desc = $4
+		WHERE id = $5
 		RETURNING id
 	`
 
-	args := []any{review.BookID, review.UserID, review.Rating, review.ID}
+	args := []any{review.BookID, review.UserID, review.Rating, review.Desc, review.ID}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
