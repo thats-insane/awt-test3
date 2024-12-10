@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -45,6 +46,12 @@ func (a *appDependencies) createBookHandler(w http.ResponseWriter, r *http.Reque
 
 	err = a.bookModel.Insert(book)
 	if err != nil {
+		// i expect an error here since i get a server error, but the log i place here doesnt show up
+		// leading me to believe the error is somewhere else
+		// book isnt entered in the database, so it has to be before this point, but i cant think of where
+		// i checked the authenticate() middleware, it was not there
+		// not sure what the issue is, but i cannot figure it out
+		log.Println("insert failed")
 		a.serverErr(w, r, err)
 		return
 	}
@@ -126,25 +133,6 @@ func (a *appDependencies) updateBookHandler(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		a.badRequest(w, r, err)
 		return
-	}
-
-	if incomingData.Title != nil {
-		book.Title = *incomingData.Title
-	}
-	if incomingData.Author != nil {
-		book.Author = *incomingData.Author
-	}
-	if incomingData.ISBN != nil {
-		book.ISBN = *incomingData.ISBN
-	}
-	if incomingData.PubDate != nil {
-		book.PubDate = *incomingData.PubDate
-	}
-	if incomingData.Genre != nil {
-		book.Genre = *incomingData.Genre
-	}
-	if incomingData.Desc != nil {
-		book.Desc = *incomingData.Desc
 	}
 
 	v := validator.New()

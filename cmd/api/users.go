@@ -184,7 +184,7 @@ func (a *appDependencies) displayUserListsHandler(w http.ResponseWriter, r *http
 		return
 	}
 
-	books, err := a.listModel.GetBooks(booklist.BookListID)
+	books, err := a.listModel.GetBooks(booklist.ID)
 	if err != nil {
 		switch {
 		case errors.Is(err, data.ErrRecordNotFound):

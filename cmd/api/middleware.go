@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -109,6 +110,8 @@ func (a *appDependencies) authenticate(next http.Handler) http.Handler {
 			case errors.Is(err, data.ErrRecordNotFound):
 				a.invalidAuthToken(w, r)
 			default:
+				// i also checked this default error to no avail
+				log.Println("auth failed")
 				a.serverErr(w, r, err)
 			}
 			return

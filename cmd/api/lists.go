@@ -12,11 +12,10 @@ import (
 /* Create a new list */
 func (a *appDependencies) createListHandler(w http.ResponseWriter, r *http.Request) {
 	var incomingData struct {
-		Name       string `json:"name"`
-		Desc       string `json:"description"`
-		UserID     int64  `json:"user_id"`
-		BookListID int64  `json:"books"`
-		Status     string `json:"status"`
+		Name   string `json:"name"`
+		Desc   string `json:"description"`
+		UserID int64  `json:"user_id"`
+		Status string `json:"status"`
 	}
 	err := a.readJSON(w, r, &incomingData)
 	if err != nil {
@@ -25,11 +24,10 @@ func (a *appDependencies) createListHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	list := &data.List{
-		Name:       incomingData.Name,
-		Desc:       incomingData.Desc,
-		UserID:     incomingData.UserID,
-		BookListID: incomingData.BookListID,
-		Status:     incomingData.Status,
+		Name:   incomingData.Name,
+		Desc:   incomingData.Desc,
+		UserID: incomingData.UserID,
+		Status: incomingData.Status,
 	}
 
 	v := validator.New()
@@ -182,33 +180,16 @@ func (a *appDependencies) updateListHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	var incomingData struct {
-		Name       *string `json:"name"`
-		Desc       *string `json:"description"`
-		UserID     *int64  `json:"user_id"`
-		BookListID *int64  `json:"books"`
-		Status     *string `json:"status"`
+		Name   *string `json:"name"`
+		Desc   *string `json:"description"`
+		UserID *int64  `json:"user_id"`
+		Status *string `json:"status"`
 	}
 
 	err = a.readJSON(w, r, &incomingData)
 	if err != nil {
 		a.badRequest(w, r, err)
 		return
-	}
-
-	if incomingData.Name != nil {
-		list.Name = *incomingData.Name
-	}
-	if incomingData.Desc != nil {
-		list.Desc = *incomingData.Desc
-	}
-	if incomingData.UserID != nil {
-		list.UserID = *incomingData.UserID
-	}
-	if incomingData.BookListID != nil {
-		list.BookListID = *incomingData.BookListID
-	}
-	if incomingData.Status != nil {
-		list.Status = *incomingData.Status
 	}
 
 	v := validator.New()

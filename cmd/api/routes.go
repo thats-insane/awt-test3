@@ -6,6 +6,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+/*
+Some routes are commented due to an error (':id' in new path conflicts with existing wildcard ':id' in existing prefix). Not sure what the proper fix would be other than making each endpoint unique, which goes against the instructions
+*/
 func (a *appDependencies) routes() http.Handler {
 	router := httprouter.New()
 
@@ -14,8 +17,8 @@ func (a *appDependencies) routes() http.Handler {
 	router.HandlerFunc(http.MethodGet, "/api/v1/healthcheck", a.healthCheckHandler)
 
 	router.HandlerFunc(http.MethodGet, "/api/v1/books", a.requireActivated(a.listBooksHandler))
-	// router.HandlerFunc(http.MethodGet, "/api/v1/books/:id", a.requireActivated(a.displayBookHandler))
-	router.HandlerFunc(http.MethodGet, "/api/v1/books/search", a.requireActivated(a.searchBooksHandler))
+	router.HandlerFunc(http.MethodGet, "/api/v1/books/:id", a.requireActivated(a.displayBookHandler))
+	// router.HandlerFunc(http.MethodGet, "/api/v1/books/search", a.requireActivated(a.searchBooksHandler))
 	router.HandlerFunc(http.MethodGet, "/api/v1/lists", a.requireActivated(a.listListsHandler))
 	router.HandlerFunc(http.MethodGet, "/api/v1/lists/:id", a.requireActivated(a.displayListHandler))
 	// router.HandlerFunc(http.MethodGet, "/api/v1/books/:id/reviews", a.requireActivated(a.displayReviewHandler))

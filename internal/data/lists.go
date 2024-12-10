@@ -11,12 +11,11 @@ import (
 )
 
 type List struct {
-	ID         int64  `json:"id"`
-	Name       string `json:"name"`
-	Desc       string `json:"description"`
-	UserID     int64  `json:"user_id"`
-	BookListID int64  `json:"books"`
-	Status     string `json:"status"`
+	ID     int64  `json:"id"`
+	Name   string `json:"name"`
+	Desc   string `json:"description"`
+	UserID int64  `json:"user_id"`
+	Status string `json:"status"`
 }
 
 type BookList struct {
@@ -32,12 +31,12 @@ type ListModel struct {
 /* Add a new reading list to the database */
 func (l ListModel) Insert(list *List) error {
 	query := `
-		INSERT INTO lists(name, description, user_id, book_list_id, status)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO lists(name, description, user_id, status)
+		VALUES ($1, $2, $3, $4)
 		RETURNING id
 	`
 
-	args := []any{list.Name, list.Desc, list.UserID, list.BookListID, list.Status}
+	args := []any{list.Name, list.Desc, list.UserID, list.Status}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -48,7 +47,7 @@ func (l ListModel) Insert(list *List) error {
 /* Select all reading lists from database */
 func (l ListModel) GetAll(filters Filters) ([]*List, Metadata, error) {
 	query := fmt.Sprintf(`
-		SELECT id, name, description, user_id, book_list_id, status
+		SELECT id, name, description, user_id, status
 		FROM lists
 		ORDER BY %s %s, id ASC
 		LIMIT $1 OFFSET $2
@@ -69,7 +68,7 @@ func (l ListModel) GetAll(filters Filters) ([]*List, Metadata, error) {
 
 	for rows.Next() {
 		var list List
-		err := rows.Scan(&list.ID, &list.Name, &list.Desc, &list.UserID, &list.BookListID, &list.Status)
+		err := rows.Scan(&list.ID, &list.Name, &list.Desc, &list.UserID, &list.Status)
 		if err != nil {
 			return nil, Metadata{}, err
 		}
@@ -109,7 +108,7 @@ func (l ListModel) Get(id int64) (*List, error) {
 	}
 
 	query := `
-		SELECT id, name, description, user_id, book_list_id, status 
+		SELECT id, name, description, user_id, status 
 		FROM lists
 		WHERE id = $1
 	`
@@ -118,7 +117,7 @@ func (l ListModel) Get(id int64) (*List, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	err := l.DB.QueryRowContext(ctx, query, id).Scan(&list.ID, &list.Name, &list.Desc, &list.UserID, &list.BookListID, &list.Status)
+	err := l.DB.QueryRowContext(ctx, query, id).Scan(&list.ID, &list.Name, &list.Desc, &list.UserID, &list.Status)
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -162,12 +161,12 @@ func (l ListModel) GetBooks(id int64) (*BookList, error) {
 func (l ListModel) Update(list *List) error {
 	query := `
 		UPDATE list
-		SET name = $1, description = $2, user_id = $3, book_list_id = $4, status = $5
-		WHERE id = $6
+		SET name = $1, description = $2, user_id = $3, status = $4
+		WHERE id = $5
 		RETURNING id
 	`
 
-	args := []any{list.Name, list.Desc, &list.UserID, &list.BookListID, &list.Status}
+	args := []any{list.Name, list.Desc, &list.UserID, &list.Status}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -241,7 +240,6 @@ func ValidateList(v *validator.Validator, list *List) {
 	v.Check(list.Name != "", "list", "must be provided")
 	v.Check(len(list.Name) <= 100, "list", "must not be more than 100 bytes long")
 	v.Check(list.UserID > 0, "list", "must be a positive integer")
-	v.Check(list.BookListID > 0, "list", "must be a positive integer")
 	v.Check(list.Desc != "", "list", "must be provided")
 	v.Check(len(list.Desc) <= 225, "list", "must not be more than 225 bytes long")
 	v.Check(list.Status == "reading" || list.Status == "finished", "list", "must be reading or finished")

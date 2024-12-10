@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS books (
     publication_date DATE,
     genre VARCHAR(50),
     description TEXT,
-    average_rating DECIMAL(3,2) CHECK (average_rating BETWEEN 0 AND 5) DEFAULT 0.0
+    average_rating DECIMAL(3,2) DEFAULT 0.0
 );
