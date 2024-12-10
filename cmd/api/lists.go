@@ -13,7 +13,7 @@ import (
 func (a *appDependencies) createListHandler(w http.ResponseWriter, r *http.Request) {
 	var incomingData struct {
 		Name       string `json:"name"`
-		Desc       string `json:"desc"`
+		Desc       string `json:"description"`
 		UserID     int64  `json:"user_id"`
 		BookListID int64  `json:"books"`
 		Status     string `json:"status"`
@@ -183,7 +183,7 @@ func (a *appDependencies) updateListHandler(w http.ResponseWriter, r *http.Reque
 
 	var incomingData struct {
 		Name       *string `json:"name"`
-		Desc       *string `json:"desc"`
+		Desc       *string `json:"description"`
 		UserID     *int64  `json:"user_id"`
 		BookListID *int64  `json:"books"`
 		Status     *string `json:"status"`

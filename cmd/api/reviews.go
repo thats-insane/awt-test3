@@ -16,7 +16,7 @@ func (a *appDependencies) createReviewHandler(w http.ResponseWriter, r *http.Req
 		BookID    int64     `json:"book_id"`
 		UserID    int64     `json:"user_id"`
 		Rating    int64     `json:"rating"`
-		Desc      string    `json:"desc"`
+		Desc      string    `json:"description"`
 		CreatedAt time.Time `json:"-"`
 	}
 	err := a.readJSON(w, r, &incomingData)
@@ -113,7 +113,7 @@ func (a *appDependencies) updateReviewHandler(w http.ResponseWriter, r *http.Req
 		BookID    *int64     `json:"book_id"`
 		UserID    *int64     `json:"user_id"`
 		Rating    *int64     `json:"rating"`
-		Desc      *string    `json:"desc"`
+		Desc      *string    `json:"description"`
 		CreatedAt *time.Time `json:"-"`
 	}
 	err = a.readJSON(w, r, &incomingData)

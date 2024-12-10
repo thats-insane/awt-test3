@@ -18,7 +18,7 @@ func (a *appDependencies) createBookHandler(w http.ResponseWriter, r *http.Reque
 		ISBN      string    `json:"isbn"`
 		PubDate   time.Time `json:"pub_date"`
 		Genre     string    `json:"genre"`
-		Desc      string    `json:"desc"`
+		Desc      string    `json:"description"`
 		AvgRating float64   `json:"avg_rating"`
 	}
 	err := a.readJSON(w, r, &incomingData)
@@ -119,7 +119,7 @@ func (a *appDependencies) updateBookHandler(w http.ResponseWriter, r *http.Reque
 		PubDate   *time.Time `json:"pub_date"`
 		ISBN      *string    `json:"isbn"`
 		Genre     *string    `json:"genre"`
-		Desc      *string    `json:"desc"`
+		Desc      *string    `json:"description"`
 		AvgRating *int       `json:"avg_rating"`
 	}
 	err = a.readJSON(w, r, &incomingData)
