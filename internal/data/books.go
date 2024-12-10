@@ -208,6 +208,5 @@ func ValidateBook(v *validator.Validator, book *Book) {
 	v.Check(book.ISBN != "", "book", "must be provided")
 	v.Check(book.Genre != "", "book", "must be provided")
 	v.Check(book.Desc != "", "book", "must be provided")
-	v.Check(len(book.Desc) <= 225, "book", "must not be more than 225 bytes long")
 	v.Check(book.AvgRating >= 1 && book.AvgRating <= 5, "book", "must be between 1 and 5")
 }
